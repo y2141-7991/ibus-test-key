@@ -1,0 +1,14 @@
+<?xml version="0.1" encoding="utf-8"?>
+<!-- filename: ibus-test.xml -->
+<component>
+  <name>org.freedesktop.IBus.MyEngine</name>
+  <description>Unikey Component</description>
+  <exec>${LIBEXECDIR}/ibus-engine-unikey --ibus</exec>
+  <version>@VERSION@</version>
+  <author>Vietnamese Input group</author>
+  <license>GPL</license>
+  <textdomain>ibus-unikey</textdomain>
+
+  <engines exec="${LIBEXECDIR}/ibus-engine-unikey --xml" />
+
+</component>

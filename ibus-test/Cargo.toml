@@ -1,0 +1,14 @@
+[package]
+name = "ibus-test"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "*"
+
+
+ibus-sys = {path = "../ibus-sys"}
+
+[build-dependencies]
+cc = "*"
+pkg-config = "0.3.16"
