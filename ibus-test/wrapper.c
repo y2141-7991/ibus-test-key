@@ -38,7 +38,6 @@ static void ibus_my_engine_class_init(IbusMyEngineClass *klass) {
 static void ibus_my_engine_init(IbusMyEngine *engine) {
 }
 
-// Handle key events
 static gboolean ibus_my_engine_process_key_event(IBusEngine *engine, guint keyval, guint keycode, guint modifiers) {
     g_print("Key Pressed: keyval=%u, keycode=%u, modifiers=%u\n", keyval, keycode, modifiers);
     return global_key_event_cb(global_context, engine, keyval, keycode, modifiers);

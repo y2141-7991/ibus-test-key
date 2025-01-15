@@ -50,6 +50,14 @@ impl IBusKeyMap {
 
 type MyIBusEngineCommand = fn(&mut MyIBusContext, *mut IBusEngine) -> bool;
 
+pub(crate) fn ibus_my_engine_command_map() -> HashMap<&'static str, MyIBusEngineCommand> {
+    let mut mapping: HashMap<&str, MyIBusEngineCommand> = HashMap::new();
+
+    let register = |name: &'static str, cmd: MyIBusEngineCommand| mapping.insert(name, cmd);
+
+    mapping
+}
+
 
 #[repr(C)]
 struct MyIBusContext {
@@ -91,7 +99,7 @@ unsafe extern "C" fn process_key_event(
     keyval: guint,
     modifiers: guint
 ) -> bool {
-    println!("helllooooo");
+    
     let context = &mut *(context as *mut MyIBusContext);
     context.process_key_event(engine, keyval, keycode, modifiers);
     true
