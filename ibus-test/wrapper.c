@@ -6,7 +6,7 @@
 
 typedef gboolean (*ibus_my_engine_callback_key_event)(void* ctx, IBusEngine* engine, guint keyval, guint keycode, guint modifiers);
 
-void ibus_my_engine_set_callback(void* ctx, ibus_my_engine_callback_key_event* cb);
+void ibus_my_engine_set_callback(void* ctx, ibus_my_engine_callback_key_event cb);
 
 
 
@@ -45,9 +45,9 @@ static gboolean ibus_my_engine_process_key_event(IBusEngine *engine, guint keyva
 
 void ibus_my_engine_set_callback(
     void* context,
-    ibus_my_engine_callback_key_event* key_event_cb
+    ibus_my_engine_callback_key_event key_event_cb
 ) {
-    printf(key_event_cb);
+    printf(context);
     global_context = context;
     global_key_event_cb = key_event_cb;
 }

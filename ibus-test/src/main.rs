@@ -1,5 +1,6 @@
-#[allow(non_camel_case_types)]
-#[allow(non_snake_case)]
+#![allow(non_camel_case_types)]
+#![allow(non_upper_case_globals)]
+#![allow(dead_code)]
 
 
 use std::ffi::{c_void, CString};
@@ -53,8 +54,11 @@ type MyIBusEngineCommand = fn(&mut MyIBusContext, *mut IBusEngine) -> bool;
 pub(crate) fn ibus_my_engine_command_map() -> HashMap<&'static str, MyIBusEngineCommand> {
     let mut mapping: HashMap<&str, MyIBusEngineCommand> = HashMap::new();
 
-    let register = |name: &'static str, cmd: MyIBusEngineCommand| mapping.insert(name, cmd);
-
+    let mut register = |name: &'static str, cmd: MyIBusEngineCommand| mapping.insert(name, cmd);
+    register("escape", |context, engine| {
+        println!("{:?}", engine);
+        true
+    });
     mapping
 }
 
@@ -66,6 +70,9 @@ struct MyIBusContext {
 }
 
 impl MyIBusContext {
+    fn new() -> Self {
+        MyIBusContext {command_map: ibus_my_engine_command_map() }
+    }
     fn process_key_event(&mut self, engine: *mut IBusEngine, keyval: guint, keycode: guint, modifiers: guint) {
         println!("keyval={keyval}, keycode={keycode}, modifiers={modifiers}");
     }
@@ -75,7 +82,7 @@ impl MyIBusContext {
     }
 }
 
-pub(crate) type ibus_my_engine_key_event_callback = unsafe extern "C" fn(
+pub(crate) type ibus_my_engine_callback_key_event = unsafe extern "C" fn(
     context: *mut c_void,
     engine: *mut IBusEngine,
     keyval: guint,
@@ -88,8 +95,8 @@ extern "C" {
 
     pub (crate) fn ibus_my_engine_set_callback(
         context: *mut c_void,
-        key_event_callback: ibus_my_engine_key_event_callback,
-    );
+        key_event_callback: ibus_my_engine_callback_key_event,
+    ) -> bool;
 }
 
 unsafe extern "C" fn process_key_event(
@@ -99,16 +106,18 @@ unsafe extern "C" fn process_key_event(
     keyval: guint,
     modifiers: guint
 ) -> bool {
-    
+    println!("hi");
     let context = &mut *(context as *mut MyIBusContext);
     context.process_key_event(engine, keyval, keycode, modifiers);
     true
 }
 
 fn main() {
+    let mut context = MyIBusContext::new();
     unsafe {
-        let ctx: *mut c_void = std::ptr::null_mut(); 
-        ibus_my_engine_set_callback(ctx, process_key_event);
+        // let ctx: *mut c_void = &mut context as ;
+        // println!("{:?}", context);
+        ibus_my_engine_set_callback(&mut context as *mut _ as *mut c_void, process_key_event);
         ibus_main_init();
         ibus_main();
     }
