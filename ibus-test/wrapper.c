@@ -5,13 +5,19 @@
 #define IBUS_TYPE_MY_ENGINE (ibus_my_engine_get_type())
 
 typedef gboolean (*ibus_my_engine_callback_key_event)(void* ctx, IBusEngine* engine, guint keyval, guint keycode, guint modifiers);
+typedef gboolean (*ibus_my_engine_callback_candidate_clicked)(void* ctx, IBusEngine* engine, guint index, guint button, guint state);
+typedef void (*ibus_my_engine_callback_focus_in)(void* ctx, IBusEngine* engine);
 
-void ibus_my_engine_set_callback(void* ctx, ibus_my_engine_callback_key_event cb);
+
+void ibus_my_engine_set_callback(void* ctx, ibus_my_engine_callback_key_event* cb, ibus_my_engine_callback_candidate_clicked*, ibus_my_engine_callback_focus_in*);
 
 
 
 static void* global_context = NULL;
 static ibus_my_engine_callback_key_event global_key_event_cb = NULL;
+static ibus_my_engine_callback_candidate_clicked global_candidate_clicked_cb = NULL;
+static ibus_my_engine_callback_focus_in global_focus_in_cb = NULL;
+
 
 struct _IbusMyEngine {
     IBusEngine parent_instance;
@@ -45,7 +51,9 @@ static gboolean ibus_my_engine_process_key_event(IBusEngine *engine, guint keyva
 
 void ibus_my_engine_set_callback(
     void* context,
-    ibus_my_engine_callback_key_event key_event_cb
+    ibus_my_engine_callback_key_event* key_event_cb,
+    ibus_my_engine_callback_candidate_clicked* candidated_click_cb,
+    ibus_my_engine_callback_focus_in* focus_in_cb,
 ) {
     printf(context);
     global_context = context;
@@ -53,6 +61,7 @@ void ibus_my_engine_set_callback(
 }
 
 void ibus_main_init() {
+    void* context;
     IBusBus *bus;
     IBusFactory *factory;
 
@@ -67,8 +76,9 @@ void ibus_main_init() {
     g_object_ref_sink(factory);
 
     ibus_factory_add_engine(factory, "my-engine", IBUS_TYPE_MY_ENGINE);
-    ibus_bus_request_name(bus, "org.freedesktop.IBus.MyEngine", 0);    
-
+    ibus_bus_request_name(bus, "org.freedesktop.IBus.MyEngine", 0);  
+  
+    // ibus_my_engine_set_callback(context, ibus_my_engine_process_key_event);
     // g_object_unref(factory);
     // g_object_unref(bus);
 }
