@@ -7,9 +7,9 @@
 typedef gboolean (*ibus_my_engine_callback_key_event)(void* ctx, IBusEngine* engine, guint keyval, guint keycode, guint modifiers);
 typedef gboolean (*ibus_my_engine_callback_candidate_clicked)(void* ctx, IBusEngine* engine, guint index, guint button, guint state);
 typedef void (*ibus_my_engine_callback_focus_in)(void* ctx, IBusEngine* engine);
+typedef void (*ibus_my_engine_callback_property_activate)(void* ctx, IBusEngine* engine, const gchar prop_name, guint prop_state);
 
-
-void ibus_my_engine_set_callback(void* ctx, ibus_my_engine_callback_key_event* cb, ibus_my_engine_callback_candidate_clicked*, ibus_my_engine_callback_focus_in*);
+void ibus_my_engine_set_callback(void* ctx, ibus_my_engine_callback_key_event* cb, ibus_my_engine_callback_candidate_clicked*, ibus_my_engine_callback_focus_in*, ibus_my_engine_callback_property_activate*);
 
 
 
@@ -17,6 +17,7 @@ static void* global_context = NULL;
 static ibus_my_engine_callback_key_event global_key_event_cb = NULL;
 static ibus_my_engine_callback_candidate_clicked global_candidate_clicked_cb = NULL;
 static ibus_my_engine_callback_focus_in global_focus_in_cb = NULL;
+static ibus_my_engine_callback_property_activate global_property_activate_cb = NULL;
 
 
 struct _IbusMyEngine {
@@ -34,12 +35,13 @@ static void ibus_my_engine_class_init(IbusMyEngineClass *klass);
 static void ibus_my_engine_init(IbusMyEngine *engine);
 static gboolean ibus_my_engine_process_key_event(IBusEngine *engine, guint keyval, guint keycode, guint modifiers);
 
+static void ibus_my_engine_focus_in(IBusEngine *engine);
+static void ibus_my_engine_property_activate(IBusEngine *engine, const gchar *prop_name, guint prop_state);
+
+
 G_DEFINE_TYPE(IbusMyEngine, ibus_my_engine, IBUS_TYPE_ENGINE)
 
-static void ibus_my_engine_class_init(IbusMyEngineClass *klass) {
-    IBusEngineClass *engine_class = IBUS_ENGINE_CLASS(klass);
-    engine_class->process_key_event = ibus_my_engine_process_key_event;
-}
+
 
 static void ibus_my_engine_init(IbusMyEngine *engine) {
 }
@@ -49,11 +51,32 @@ static gboolean ibus_my_engine_process_key_event(IBusEngine *engine, guint keyva
     return global_key_event_cb(global_context, engine, keyval, keycode, modifiers);
 }
 
+static gboolean ibus_my_engine_candidate_clicked(IBusEngine *engine, int index, int button, int state) {
+    return global_candidate_clicked_cb(global_context, engine, index, button, state);
+}
+
+static void ibus_my_engine_focus_in(IBusEngine *engine) {
+    global_focus_in_cb(global_context, engine);
+}
+
+static void ibus_my_engine_property_activate(IBusEngine *engine, const gchar *prop_name, guint prop_state) {
+    global_property_activate_cb(global_context, engine, prop_name, prop_state);
+}
+
+static void ibus_my_engine_class_init(IbusMyEngineClass *klass) {
+    IBusEngineClass *engine_class = IBUS_ENGINE_CLASS(klass);
+    engine_class->process_key_event = ibus_my_engine_process_key_event;
+    engine_class->candidate_clicked = ibus_my_engine_candidate_clicked;
+    engine_class->focus_in = ibus_my_engine_focus_in;
+    engine_class->property_activate = ibus_my_engine_property_activate;
+}
+
 void ibus_my_engine_set_callback(
     void* context,
     ibus_my_engine_callback_key_event* key_event_cb,
     ibus_my_engine_callback_candidate_clicked* candidated_click_cb,
     ibus_my_engine_callback_focus_in* focus_in_cb,
+    ibus_my_engine_callback_property_activate* property_activate_cb
 ) {
     printf(context);
     global_context = context;
