@@ -7,7 +7,7 @@ use std::ffi::{c_void, CString};
 use anyhow::Ok;
 use ibus_sys::engine::IBusEngine;
 use ibus_sys::core::ibus_main;
-use ibus_sys::glib::guint;
+use ibus_sys::glib::{gchar, guint};
 use ibus_sys::keys::ibus_keyval_from_name;
 use std::collections::HashMap;
 
@@ -90,12 +90,35 @@ pub(crate) type ibus_my_engine_callback_key_event = unsafe extern "C" fn(
     modifiers: guint,
 ) -> bool;
 
+pub(crate) type ibus_my_engine_callback_candidate_clicked = unsafe extern "C" fn(
+    context: *mut c_void,
+    engine: *mut IBusEngine,
+    index: guint,
+    button: guint,
+    state: guint
+) -> bool;
+
+pub(crate) type ibus_my_engine_callback_focus_in = unsafe extern "C" fn(
+    context: *mut c_void,
+    engine: *mut IBusEngine
+);
+
+pub(crate) type ibus_my_engine_callback_property_activate = unsafe extern "C" fn(
+    context: *mut c_void,
+    engine: *mut IBusEngine,
+    prop_name: *mut gchar,
+    prop_state: guint
+);
+
 extern "C" {
     fn ibus_main_init();
 
     pub (crate) fn ibus_my_engine_set_callback(
         context: *mut c_void,
         key_event_callback: ibus_my_engine_callback_key_event,
+        candidated_click_cb: ibus_my_engine_callback_candidate_clicked,
+        focus_in_cb: ibus_my_engine_callback_focus_in,
+        property_activate_cb: ibus_my_engine_callback_property_activate
     ) -> bool;
 }
 
@@ -112,12 +135,47 @@ unsafe extern "C" fn process_key_event(
     true
 }
 
+unsafe extern "C" fn candidated_clicked(
+    context: *mut c_void,
+    engine: *mut IBusEngine,
+    index: guint,
+    button: guint,
+    state: guint
+) -> bool {
+
+    println!("{}, {}, {}", index, button, state);
+    true
+}
+
+unsafe extern "C" fn focus_in(
+    context: *mut c_void,
+    engine: *mut IBusEngine
+) {
+    println!("Focus in");
+}
+
+unsafe extern "C" fn property_activate(
+    context: *mut c_void,
+    engine: *mut IBusEngine,
+    prop_name: *mut gchar,
+    prop_state: guint
+) {
+    println!("{:?}, {}", prop_name, prop_state);
+}
+
+
+
 fn main() {
     let mut context = MyIBusContext::new();
     unsafe {
         // let ctx: *mut c_void = &mut context as ;
         // println!("{:?}", context);
-        ibus_my_engine_set_callback(&mut context as *mut _ as *mut c_void, process_key_event);
+        ibus_my_engine_set_callback(
+            &mut context as *mut _ as *mut c_void,
+            process_key_event,
+            candidated_clicked,
+            focus_in,
+            property_activate);
         ibus_main_init();
         ibus_main();
     }
@@ -126,75 +184,3 @@ fn main() {
 
 
 
-// struct MyContext {
-//     some_data: i32,
-// }
-
-// extern "C" fn process_key_event_with_context(
-//     ctx: *mut c_void,
-//     _engine: *mut c_void,
-//     keyval: guint,
-//     keycode: guint,
-//     modifiers: guint,
-// ) -> guint {
-//     let context = unsafe { &*(ctx as *mut MyContext) };
-
-//     println!(
-//         "Key event: keyval={}, keycode={}, modifiers={}, context data={}",
-//         keyval, keycode, modifiers, context.some_data
-//     );
-
-//     0 // Not handled
-// }
-
-// type IBusCallbackKeyEvent = extern "C" fn(
-//     ctx: *mut c_void,
-//     engine: *mut c_void, // Replace with a proper `IBusEngine` type if available
-//     keyval: guint,
-//     keycode: guint,
-//     modifiers: guint,
-// ) -> guint;
-
-// extern "C" fn process_key_event(
-//     ctx: *mut c_void,
-//     engine: *mut c_void,
-//     keyval: guint,
-//     keycode: guint,
-//     modifiers: guint,
-// ) -> guint {
-//     println!(
-//         "Key event: ctx={:?}, keyval={}, keycode={}, modifiers={}",
-//         ctx, keyval, keycode, modifiers
-//     );
-
-//     // Process the event and return whether it was handled (1 for true, 0 for false)
-//     if keyval == 65 { // Example: Check if the keyval is 'A'
-//         1 // Handled
-//     } else {
-//         0 // Not handled
-//     }
-// }
-
-// extern "C" {
-//     fn ibus_engine_set_key_event_handler(
-//         engine: *mut c_void,
-//         handler: IBusCallbackKeyEvent,
-//         user_data: *mut c_void,
-//     );
-// }
-
-
-// fn main() {
-//     let mut context = MyContext { some_data: 42 };
-//     let engine: *mut c_void = std::ptr::null_mut();
-
-//     unsafe {
-//         ibus_engine_set_key_event_handler(
-//             engine,
-//             process_key_event_with_context,
-//             &mut context as *mut _ as *mut c_void,
-//         );
-//     }
-
-//     println!("Callback with context registered!");
-// }

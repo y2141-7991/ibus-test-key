@@ -1,7 +1,6 @@
 #include <ibus.h>
 #include <stdio.h>
 
-
 #define IBUS_TYPE_MY_ENGINE (ibus_my_engine_get_type())
 
 typedef gboolean (*ibus_my_engine_callback_key_event)(void* ctx, IBusEngine* engine, guint keyval, guint keycode, guint modifiers);
@@ -78,10 +77,16 @@ void ibus_my_engine_set_callback(
     ibus_my_engine_callback_focus_in* focus_in_cb,
     ibus_my_engine_callback_property_activate* property_activate_cb
 ) {
-    printf(context);
+    printf(focus_in_cb);
     global_context = context;
     global_key_event_cb = key_event_cb;
+    global_candidate_clicked_cb = candidated_click_cb;
+    global_focus_in_cb = focus_in_cb;
+    global_property_activate_cb = property_activate_cb;
 }
+
+static gboolean ibus = FALSE;
+#define PKGDATADIR "@DATADIR@/ibus-test-key/"
 
 void ibus_main_init() {
     void* context;
@@ -89,7 +94,8 @@ void ibus_main_init() {
     IBusFactory *factory;
 
     ibus_init();
-    printf("Size : %zu\n", IBUS_TYPE_MY_ENGINE);
+    printf("Size : %zu\n\n\n\n\n", IBUS_TYPE_MY_ENGINE);
+    g_print(PKGDATADIR);
     bus = ibus_bus_new();
     g_object_ref_sink(bus);
 
@@ -99,7 +105,30 @@ void ibus_main_init() {
     g_object_ref_sink(factory);
 
     ibus_factory_add_engine(factory, "my-engine", IBUS_TYPE_MY_ENGINE);
-    ibus_bus_request_name(bus, "org.freedesktop.IBus.MyEngine", 0);  
+    if (ibus) {
+        ibus_bus_request_name(bus, "org.freedesktop.IBus.MyEngine", 0); 
+    } else {
+        IBusComponent* component;
+        component = ibus_component_new("org.freedesktop.IBus.MyEngine",
+                                        "MyEngine",
+                                        "0.1.0",
+                                        "GPL",
+                                        "Y <y.nguyen@gmail.com>",
+                                        "",
+                                        "",
+                                        "ibus-test-key");
+        ibus_component_add_engine (component,
+                                   ibus_engine_desc_new ("my-engine",
+                                                         "my-engine",
+                                                         "my-engine",
+                                                         "",
+                                                         "GPL",
+                                                         "Y <ndty14@gmail.com>",
+                                                         PKGDATADIR"/icons/ibus-enchant.svg",
+                                                         "vn"));
+        ibus_bus_register_component (bus, component);
+    }
+     
   
     // ibus_my_engine_set_callback(context, ibus_my_engine_process_key_event);
     // g_object_unref(factory);

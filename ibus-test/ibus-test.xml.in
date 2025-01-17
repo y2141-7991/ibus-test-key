@@ -3,12 +3,12 @@
 <component>
   <name>org.freedesktop.IBus.MyEngine</name>
   <description>Unikey Component</description>
-  <exec>${LIBEXECDIR}/ibus-engine-unikey --ibus</exec>
+  <exec>${LIBEXECDIR}/ibus-test --ibus</exec>
   <version>@VERSION@</version>
   <author>Vietnamese Input group</author>
   <license>GPL</license>
-  <textdomain>ibus-unikey</textdomain>
+  <textdomain>ibus-my-engine</textdomain>
 
-  <engines exec="${LIBEXECDIR}/ibus-engine-unikey --xml" />
+  <engines exec="${LIBEXECDIR}/ibus-engine-my-engine --xml" />
 
 </component>
