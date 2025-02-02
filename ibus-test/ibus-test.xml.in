@@ -9,6 +9,18 @@
   <license>GPL</license>
   <textdomain>ibus-my-engine</textdomain>
 
-  <engines exec="${LIBEXECDIR}/ibus-engine-my-engine --xml" />
+  <engines>
+		<engine>
+			<name>ibus-test</name>
+			<language>vn</language>
+			<license>GPL</license>
+			<author>Y &lt;ndty14@gmail.com&gt;</author>
+			<icon>${pkgdatadir}/icons/ibus-enchant.svg</icon>
+			<layout>us</layout>
+			<longname>ibus-test</longname>
+			<description>VN Ibus Test Input Method</description>
+			<rank>0</rank>
+		</engine>
+	</engines>
 
 </component>

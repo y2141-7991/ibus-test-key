@@ -86,7 +86,7 @@ void ibus_my_engine_set_callback(
 }
 
 static gboolean ibus = FALSE;
-#define PKGDATADIR "@DATADIR@/ibus-test-key/"
+#define PKGDATADIR "@DATADIR@/ibus-test/"
 
 void ibus_main_init() {
     void* context;
@@ -94,8 +94,9 @@ void ibus_main_init() {
     IBusFactory *factory;
 
     ibus_init();
+
     printf("Size : %zu\n\n\n\n\n", IBUS_TYPE_MY_ENGINE);
-    g_print(PKGDATADIR);
+
     bus = ibus_bus_new();
     g_object_ref_sink(bus);
 
@@ -121,12 +122,13 @@ void ibus_main_init() {
                                    ibus_engine_desc_new ("my-engine",
                                                          "my-engine",
                                                          "my-engine",
-                                                         "",
+                                                         "vn",
                                                          "GPL",
                                                          "Y <ndty14@gmail.com>",
                                                          PKGDATADIR"/icons/ibus-enchant.svg",
                                                          "vn"));
         ibus_bus_register_component (bus, component);
+        
     }
      
   
