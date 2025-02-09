@@ -9,9 +9,11 @@ use ibus_sys::engine::IBusEngine;
 use ibus_sys::core::ibus_main;
 use ibus_sys::glib::{gchar, guint};
 use ibus_sys::keys::ibus_keyval_from_name;
+use prop_controller::PropController;
 use std::collections::HashMap;
 
-
+mod prop_controller;
+mod input_mode;
 
 #[derive(Hash, PartialEq)]
 struct IBusKeyPattern {
@@ -66,12 +68,13 @@ pub(crate) fn ibus_my_engine_command_map() -> HashMap<&'static str, MyIBusEngine
 #[repr(C)]
 struct MyIBusContext {
     // keymap: IBusKy
-    command_map: HashMap<&'static str, MyIBusEngineCommand>
+    command_map: HashMap<&'static str, MyIBusEngineCommand>,
+    prop_controller: PropController
 }
 
 impl MyIBusContext {
     fn new() -> Self {
-        MyIBusContext {command_map: ibus_my_engine_command_map() }
+        MyIBusContext {command_map: ibus_my_engine_command_map() , prop_controller: PropController::new()}
     }
     fn process_key_event(&mut self, engine: *mut IBusEngine, keyval: guint, keycode: guint, modifiers: guint) {
         println!("keyval={keyval}, keycode={keycode}, modifiers={modifiers}");
@@ -79,6 +82,12 @@ impl MyIBusContext {
 
     fn run_event_listener(&mut self, engine: *mut IBusEngine) {
         
+    }
+
+    fn do_focus_in(&mut self, engine: *mut IBusEngine) {
+        println!("Focus In");
+        self.prop_controller.do_focus_in(engine);
+
     }
 }
 
@@ -151,7 +160,8 @@ unsafe extern "C" fn focus_in(
     context: *mut c_void,
     engine: *mut IBusEngine
 ) {
-    println!("Focus in");
+    let context = &mut *(context as *mut MyIBusContext);
+    context.do_focus_in(engine);
 }
 
 unsafe extern "C" fn property_activate(

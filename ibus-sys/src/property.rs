@@ -11,11 +11,11 @@ pub const IBusPropState_PROP_STATE_UNCHECKED: IBusPropState = 0;
 pub const IBusPropState_PROP_STATE_CHECKED: IBusPropState = 1;
 pub const IBusPropState_PROP_STATE_INCONSISTENT: IBusPropState = 2;
 
-pub const IBusPropType_PROP_TPYE_NORMAL: IBusPropType = 0;
-pub const IBusPropType_PROP_TPYE_TOGGLE: IBusPropType = 1;
-pub const IBusPropType_PROP_TPYE_RADIO: IBusPropType = 2;
-pub const IBusPropType_PROP_TPYE_MENU: IBusPropType = 3;
-pub const IBusPropType_PROP_TPYE_SEPARATOR: IBusPropType = 4;
+pub const IBusPropType_PROP_TYPE_NORMAL: IBusPropType = 0;
+pub const IBusPropType_PROP_TYPE_TOGGLE: IBusPropType = 1;
+pub const IBusPropType_PROP_TYPE_RADIO: IBusPropType = 2;
+pub const IBusPropType_PROP_TYPE_MENU: IBusPropType = 3;
+pub const IBusPropType_PROP_TYPE_SEPARATOR: IBusPropType = 4;
 
 extern "C" {
     pub fn ibus_property_new(

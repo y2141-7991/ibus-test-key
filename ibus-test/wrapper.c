@@ -89,7 +89,6 @@ static gboolean ibus = FALSE;
 #define PKGDATADIR "@DATADIR@/ibus-test/"
 
 void ibus_main_init() {
-    void* context;
     IBusBus *bus;
     IBusFactory *factory;
 

@@ -36,6 +36,6 @@ extern "C" {
     pub fn ibus_quit();
 }
 
-pub fn to_boolean(b: bool) -> gboolean {
+pub fn to_gboolean(b: bool) -> gboolean {
     i32::from(b)
 }
