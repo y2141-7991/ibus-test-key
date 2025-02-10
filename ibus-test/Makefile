@@ -10,10 +10,12 @@ MKFILE_DIR := $(dir $(MKFILE_PATH))
 all: ibus-test.xml config.h ../target/release/ibus-test
 
 
-config.h: config.h.in sed -e "s:@DATADIR@:$(DATADIR)/:g" $< > $@
+config.h: config.h.in
+	sed \
+	    -e "s:@DATADIR@:$(DATADIR)/:g" $< > $@
 
 
-ibus-test.xml: ibus-test.xml.in sed -e "s:@BINARY@:$(MKFILE_DIR)/ibus-akaza-debug.sh:g" -e "s:@DATADIR@:$(DATADIR)/:g" $< > $@
+# ibus-test.xml: ibus-test.xml.in sed -e "s:@BINARY@:$(MKFILE_DIR)/ibus-akaza-debug.sh:g" -e "s:@DATADIR@:$(DATADIR)/:g" $< > $@
 
 
-../target/release/ibus-test:
+# ../target/release/ibus-test:

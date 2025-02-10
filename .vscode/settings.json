@@ -11,7 +11,8 @@
     "glib.h": "c",
     "gversion.h": "c",
     "gobject.h": "c",
-    "gtk.h": "c"
+    "gtk.h": "c",
+    "config.h": "c"
   },
   "C_Cpp_Runner.msvcBatchPath": "",
   "C_Cpp_Runner.cCompilerPath": "gcc",

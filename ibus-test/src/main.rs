@@ -67,7 +67,6 @@ pub(crate) fn ibus_my_engine_command_map() -> HashMap<&'static str, MyIBusEngine
 
 #[repr(C)]
 struct MyIBusContext {
-    // keymap: IBusKy
     command_map: HashMap<&'static str, MyIBusEngineCommand>,
     prop_controller: PropController
 }
@@ -128,7 +127,7 @@ extern "C" {
         candidated_click_cb: ibus_my_engine_callback_candidate_clicked,
         focus_in_cb: ibus_my_engine_callback_focus_in,
         property_activate_cb: ibus_my_engine_callback_property_activate
-    ) -> bool;
+    );
 }
 
 unsafe extern "C" fn process_key_event(
@@ -160,6 +159,7 @@ unsafe extern "C" fn focus_in(
     context: *mut c_void,
     engine: *mut IBusEngine
 ) {
+    println!("hiii");
     let context = &mut *(context as *mut MyIBusContext);
     context.do_focus_in(engine);
 }
@@ -189,7 +189,6 @@ fn main() {
         ibus_main_init();
         ibus_main();
     }
-    println!("Hello, world!");
 }
 
 
