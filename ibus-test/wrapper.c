@@ -42,6 +42,10 @@ G_DEFINE_TYPE(IbusMyEngine, ibus_my_engine, IBUS_TYPE_ENGINE)
 static void ibus_my_engine_init(IbusMyEngine *my_engine) {
 }
 
+static void ibus_my_engine_destroy(IbusMyEngine *my_engine) {
+    ((IBusObjectClass *)ibus_my_engine_parent_class)->destroy((IBusObject *)my_engine);
+}
+
 static gboolean ibus_my_engine_process_key_event(IBusEngine *engine, guint keyval, guint keycode, guint modifiers) {
     g_print("Key Pressed: keyval=%u, keycode=%u, modifiers=%u\n", keyval, keycode, modifiers);
     return global_key_event_cb(global_context, engine, keyval, keycode, modifiers);
@@ -61,6 +65,10 @@ static void ibus_my_engine_property_activate(IBusEngine *engine, const gchar *pr
 
 static void ibus_my_engine_class_init(IbusMyEngineClass *klass) {
     IBusEngineClass *engine_class = IBUS_ENGINE_CLASS(klass);
+    IBusObjectClass *object_class = IBUS_OBJECT_CLASS(klass);
+
+    object_class->destroy = (IBusObjectDestroyFunc)ibus_my_engine_destroy;
+
     engine_class->process_key_event = ibus_my_engine_process_key_event;
     engine_class->candidate_clicked = ibus_my_engine_candidate_clicked;
     engine_class->focus_in = ibus_my_engine_focus_in;
@@ -113,27 +121,22 @@ void ibus_main_init() {
         IBusComponent* component;
         component = ibus_component_new("org.freedesktop.IBus.MyEngine",
                                         "MyEngine",
-                                        "0.1.0",
+                                        "2.0",
                                         "GPL",
                                         "Y <y.nguyen@gmail.com>",
                                         "",
                                         "",
-                                        "ibus-test-key");
+                                        "myengine-sample");
         ibus_component_add_engine (component,
-                                   ibus_engine_desc_new ("my-engine",
-                                                         "my-engine",
-                                                         "my-engine",
+                                   ibus_engine_desc_new ("myengine-sample",
+                                                         "myengine-sample",
+                                                         "myengine-sample",
                                                          "vn",
                                                          "GPL",
                                                          "Y <ndty14@gmail.com>",
-                                                         PKGDATADIR"/icons/ibus-enchant.svg",
+                                                         "/usr/share/myengine/icon.png",
                                                          "vn"));
         ibus_bus_register_component (bus, component);
         
     }
-     
-  
-    // ibus_my_engine_set_callback(context, ibus_my_engine_process_key_event);
-    // g_object_unref(factory);
-    // g_object_unref(bus);
 }
