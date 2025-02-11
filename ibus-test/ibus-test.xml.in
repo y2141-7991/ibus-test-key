@@ -3,7 +3,7 @@
 <component>
   <name>org.freedesktop.IBus.MyEngine</name>
   <description>Unikey Component</description>
-  <exec>@BINARY@ --ibus</exec>
+  <exec>@BINARY@</exec>
   <version>0.1</version>
   <author>Vietnamese Input group</author>
   <license>GPL</license>

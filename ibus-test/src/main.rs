@@ -176,8 +176,6 @@ unsafe extern "C" fn property_activate(
 fn main() {
     let mut context = MyIBusContext::new();
     unsafe {
-        // let ctx: *mut c_void = &mut context as ;
-        // println!("{:?}", context);
         ibus_my_engine_set_callback(
             &mut context as *mut _ as *mut c_void,
             process_key_event,
