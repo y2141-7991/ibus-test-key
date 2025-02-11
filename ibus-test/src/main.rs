@@ -76,7 +76,7 @@ impl MyIBusContext {
         MyIBusContext {command_map: ibus_my_engine_command_map() , prop_controller: PropController::new()}
     }
     fn process_key_event(&mut self, engine: *mut IBusEngine, keyval: guint, keycode: guint, modifiers: guint) {
-        println!("keyval={keyval}, keycode={keycode}, modifiers={modifiers}");
+        println!("Process key event: keyval={keyval}, keycode={keycode}, modifiers={modifiers}");
     }
 
     fn run_event_listener(&mut self, engine: *mut IBusEngine) {
@@ -137,7 +137,6 @@ unsafe extern "C" fn process_key_event(
     keyval: guint,
     modifiers: guint
 ) -> bool {
-    println!("hi");
     let context = &mut *(context as *mut MyIBusContext);
     context.process_key_event(engine, keyval, keycode, modifiers);
     true
@@ -159,7 +158,6 @@ unsafe extern "C" fn focus_in(
     context: *mut c_void,
     engine: *mut IBusEngine
 ) {
-    println!("hiii");
     let context = &mut *(context as *mut MyIBusContext);
     context.do_focus_in(engine);
 }

@@ -1,1 +1,1 @@
-#define PKGDATADIR "@DATADIR@/ibus-my-engine/"
+#define PKGDATADIR "@DATADIR@/ibus-test/"

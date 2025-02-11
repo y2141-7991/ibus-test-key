@@ -3,11 +3,11 @@
 <component>
   <name>org.freedesktop.IBus.MyEngine</name>
   <description>Unikey Component</description>
-  <exec>${LIBEXECDIR}/ibus-test --ibus</exec>
-  <version>@VERSION@</version>
+  <exec>@BINARY@ --ibus</exec>
+  <version>0.1</version>
   <author>Vietnamese Input group</author>
   <license>GPL</license>
-  <textdomain>ibus-my-engine</textdomain>
+  <textdomain>ibus-test</textdomain>
 
   <engines>
 		<engine>
@@ -15,7 +15,7 @@
 			<language>vn</language>
 			<license>GPL</license>
 			<author>Y &lt;ndty14@gmail.com&gt;</author>
-			<icon>${pkgdatadir}/icons/ibus-enchant.svg</icon>
+			<icon>@DATADIR@/ibus-test/iconnn.svg</icon>
 			<layout>us</layout>
 			<longname>ibus-test</longname>
 			<description>VN Ibus Test Input Method</description>

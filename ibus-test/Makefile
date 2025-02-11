@@ -15,7 +15,9 @@ config.h: config.h.in
 	    -e "s:@DATADIR@:$(DATADIR)/:g" $< > $@
 
 
-# ibus-test.xml: ibus-test.xml.in sed -e "s:@BINARY@:$(MKFILE_DIR)/ibus-akaza-debug.sh:g" -e "s:@DATADIR@:$(DATADIR)/:g" $< > $@
-
+ibus-test.xml: ibus-test.xml.in
+	sed \
+	    -e "s:@BINARY@:$(PREFIX)/bin/ibus-test:g" \
+	    -e "s:@DATADIR@:$(DATADIR)/:g" $< > $@
 
 # ../target/release/ibus-test:

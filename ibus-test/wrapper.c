@@ -29,7 +29,7 @@ typedef struct _IbusMyEngineClass IbusMyEngineClass;
 
 static void ibus_my_engine_class_init(IbusMyEngineClass *klass);
 static void ibus_my_engine_init(IbusMyEngine *engine);
-
+static void ibus_my_engine_destroy(IbusMyEngine *engine);
 
 static gboolean ibus_my_engine_process_key_event(IBusEngine *engine, guint keyval, guint keycode, guint modifiers);
 static void ibus_my_engine_focus_in(IBusEngine *engine);
@@ -42,12 +42,11 @@ G_DEFINE_TYPE(IbusMyEngine, ibus_my_engine, IBUS_TYPE_ENGINE)
 static void ibus_my_engine_init(IbusMyEngine *my_engine) {
 }
 
-static void ibus_my_engine_destroy(IbusMyEngine *my_engine) {
-    ((IBusObjectClass *)ibus_my_engine_parent_class)->destroy((IBusObject *)my_engine);
+static void ibus_my_engine_destroy(IbusMyEngine *engine) {
+    ((IBusObjectClass *)ibus_my_engine_parent_class)->destroy((IBusObject *)engine);
 }
 
 static gboolean ibus_my_engine_process_key_event(IBusEngine *engine, guint keyval, guint keycode, guint modifiers) {
-    g_print("Key Pressed: keyval=%u, keycode=%u, modifiers=%u\n", keyval, keycode, modifiers);
     return global_key_event_cb(global_context, engine, keyval, keycode, modifiers);
 }
 
@@ -114,14 +113,14 @@ void ibus_main_init() {
     factory = ibus_factory_new(ibus_bus_get_connection(bus));
     g_object_ref_sink(factory);
 
-    ibus_factory_add_engine(factory, "my-engine", IBUS_TYPE_MY_ENGINE);
+    ibus_factory_add_engine(factory, "myengine-sample", IBUS_TYPE_MY_ENGINE);
     if (ibus) {
         ibus_bus_request_name(bus, "org.freedesktop.IBus.MyEngine", 0); 
     } else {
         IBusComponent* component;
         component = ibus_component_new("org.freedesktop.IBus.MyEngine",
                                         "MyEngine",
-                                        "2.0",
+                                        "0.1",
                                         "GPL",
                                         "Y <y.nguyen@gmail.com>",
                                         "",
@@ -134,8 +133,8 @@ void ibus_main_init() {
                                                          "vn",
                                                          "GPL",
                                                          "Y <ndty14@gmail.com>",
-                                                         "/usr/share/myengine/icon.png",
-                                                         "vn"));
+                                                         PKGDATADIR "/iconnn.svg",
+                                                         "default"));
         ibus_bus_register_component (bus, component);
         
     }
