@@ -103,7 +103,7 @@ void ibus_main_init() {
 
     bus = ibus_bus_new();
     g_object_ref_sink(bus);
-    IBUS_Escape
+
     g_signal_connect(bus, "disconnected", G_CALLBACK(ibus_disconnected_cb), NULL);
 
     factory = ibus_factory_new(ibus_bus_get_connection(bus));
