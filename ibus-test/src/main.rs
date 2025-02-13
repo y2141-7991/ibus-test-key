@@ -81,7 +81,8 @@ impl MyIBusContext {
         if modifiers & IBusModifierType_IBUS_RELEASE_MASK != 0 {
             return false;
         }
-
+        let text = char::from_u32(keyval).unwrap().to_string();
+        println!("{}", text.as_str());
 
         false
     }
