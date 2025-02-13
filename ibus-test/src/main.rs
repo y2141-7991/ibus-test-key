@@ -6,7 +6,7 @@
 use std::ffi::{c_void, CString};
 use anyhow::Ok;
 use ibus_sys::engine::IBusEngine;
-use ibus_sys::core::ibus_main;
+use ibus_sys::core::{ibus_main, IBusModifierType_IBUS_RELEASE_MASK};
 use ibus_sys::glib::{gchar, guint};
 use ibus_sys::keys::ibus_keyval_from_name;
 use prop_controller::PropController;
@@ -75,8 +75,15 @@ impl MyIBusContext {
     fn new() -> Self {
         MyIBusContext {command_map: ibus_my_engine_command_map() , prop_controller: PropController::new()}
     }
-    fn process_key_event(&mut self, engine: *mut IBusEngine, keyval: guint, keycode: guint, modifiers: guint) {
+    fn process_key_event(&mut self, engine: *mut IBusEngine, keyval: guint, keycode: guint, modifiers: guint) -> bool {
         println!("Process key event: keyval={keyval}, keycode={keycode}, modifiers={modifiers}");
+
+        if modifiers & IBusModifierType_IBUS_RELEASE_MASK != 0 {
+            return false;
+        }
+
+
+        false
     }
 
     fn run_event_listener(&mut self, engine: *mut IBusEngine) {

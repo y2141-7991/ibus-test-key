@@ -81,8 +81,6 @@ void ibus_my_engine_set_callback(
     ibus_my_engine_callback_focus_in* focus_in_cb,
     ibus_my_engine_callback_property_activate* property_activate_cb
 ) {
-    printf(focus_in_cb);
-    printf("\n");
     global_context = context;
     global_key_event_cb = key_event_cb;
     global_candidate_clicked_cb = candidated_click_cb;
@@ -103,11 +101,9 @@ void ibus_main_init() {
 
     ibus_init();
 
-    printf("Size : %zu\n\n\n\n\n", IBUS_TYPE_MY_ENGINE);
-
     bus = ibus_bus_new();
     g_object_ref_sink(bus);
-
+    IBUS_Escape
     g_signal_connect(bus, "disconnected", G_CALLBACK(ibus_disconnected_cb), NULL);
 
     factory = ibus_factory_new(ibus_bus_get_connection(bus));
