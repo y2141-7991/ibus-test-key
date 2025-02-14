@@ -93,7 +93,7 @@ impl MyIBusContext {
         }
 
         let text = char::from_u32(keycode).unwrap().to_string();
-        
+        self.ibus_my_engine_commit_string(engine, &text);
 
         false
     }
