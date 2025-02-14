@@ -8,7 +8,6 @@ extern "C" {
     pub fn ibus_engine_get_type() -> GType;
 }
 
-
 pub type gchar = c_char;
 pub type guint = c_uint;
 pub type gboolean = c_int;
@@ -25,5 +24,3 @@ pub struct GArray {
     pub data: *mut c_char,
     pub len: guint,
 }
-
-

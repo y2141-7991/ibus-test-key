@@ -1,8 +1,7 @@
-
 #[derive(Debug, Clone, Copy)]
 pub struct InputMode {
     pub prop_name: &'static str,
-    pub mode: i32
+    pub mode: i32,
 }
 
 impl PartialEq for InputMode {
@@ -12,11 +11,8 @@ impl PartialEq for InputMode {
 }
 
 impl InputMode {
-    const fn new(
-        prop_name: &'static str,
-        mode: i32
-    ) -> InputMode {
-        InputMode {prop_name, mode}
+    const fn new(prop_name: &'static str, mode: i32) -> InputMode {
+        InputMode { prop_name, mode }
     }
 }
 

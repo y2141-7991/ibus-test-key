@@ -13,7 +13,6 @@ fn main() {
         .probe("glib-2.0")
         .expect("Failed to find glib-2.0 using pkg-config");
 
-
     cc::Build::new()
         .file("wrapper.c")
         .includes(&libs.include_paths)
