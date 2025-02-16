@@ -3,7 +3,11 @@
 #![allow(dead_code)]
 
 use anyhow::Ok;
-use ibus_sys::attr_list::ibus_attr_list_new;
+use ibus_sys::attr_list::{ibus_attr_list_append, ibus_attr_list_new};
+use ibus_sys::attribute::{
+    ibus_attribute_new, IBusAttrType_IBUS_ATTR_TYPE_UNDERLINE,
+    IBusAttrUnderline_IBUS_ATTR_TYPE_SINGLE,
+};
 use ibus_sys::core::{ibus_main, IBusModifierType_IBUS_RELEASE_MASK};
 use ibus_sys::engine::{self, ibus_engine_commit_text, IBusEngine};
 use ibus_sys::glib::{gchar, gint, guint};
@@ -76,7 +80,7 @@ impl MyIBusContext {
             prop_controller: PropController::new(),
             preedit: String::new(),
             cursor_pos: 0,
-            lookup_table: IBusLookupTable::new(10, 0, 1, 1)
+            lookup_table: IBusLookupTable::new(10, 0, 1, 1),
         }
     }
     fn process_key_event(
@@ -100,8 +104,8 @@ impl MyIBusContext {
     fn ibus_my_engine_commit_preedit(&mut self, engine: *mut IBusEngine) -> bool {
         if self.preedit.len() == 0 {
             return false;
-        }        
-        
+        }
+
         true
     }
 
@@ -120,17 +124,21 @@ impl MyIBusContext {
     fn ibus_my_engine_update_preedit(&mut self, engine: *mut IBusEngine) {
         unsafe {
             let preedit_attrs = ibus_attr_list_new();
-            // ibus_attr_lsit
+            ibus_attr_list_append(
+                preedit_attrs,
+                ibus_attribute_new(
+                    IBusAttrType_IBUS_ATTR_TYPE_UNDERLINE,
+                    IBusAttrUnderline_IBUS_ATTR_TYPE_SINGLE,
+                    0,
+                    self.preedit.len() as guint,
+                ),
+            );
         }
     }
 
-    fn ibus_my_engine_update_auxiliary_text(&mut self, engine: *mut IBusEngine) {
+    fn ibus_my_engine_update_auxiliary_text(&mut self, engine: *mut IBusEngine) {}
 
-    }
-
-    fn ibus_my_engine_lookup_table(&mut self) {
-
-    }
+    fn ibus_my_engine_lookup_table(&mut self) {}
 
     fn run_event_listener(&mut self, engine: *mut IBusEngine) {}
 
