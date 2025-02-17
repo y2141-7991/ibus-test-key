@@ -8,12 +8,14 @@ use ibus_sys::attribute::{
     ibus_attribute_new, IBusAttrType_IBUS_ATTR_TYPE_UNDERLINE,
     IBusAttrUnderline_IBUS_ATTR_TYPE_SINGLE,
 };
-use ibus_sys::core::{ibus_main, IBusModifierType_IBUS_RELEASE_MASK};
-use ibus_sys::engine::{self, ibus_engine_commit_text, IBusEngine};
+use ibus_sys::core::{ibus_main, to_gboolean, IBusModifierType_IBUS_RELEASE_MASK};
+use ibus_sys::engine::{
+    self, ibus_engine_commit_text, ibus_engine_hide_lookup_table, ibus_engine_update_preedit_text, IBusEngine
+};
 use ibus_sys::glib::{gchar, gint, guint};
 use ibus_sys::keys::ibus_keyval_from_name;
 use ibus_sys::lookup_table::IBusLookupTable;
-use ibus_sys::text::StringExt;
+use ibus_sys::text::{ibus_text_set_attributes, StringExt};
 use prop_controller::PropController;
 use std::collections::HashMap;
 use std::ffi::{c_void, CString};
@@ -98,6 +100,7 @@ impl MyIBusContext {
 
         let text = char::from_u32(keycode).unwrap().to_string();
         self.ibus_my_engine_commit_string(engine, &text);
+        self.ibus_my_engine_update(engine);
 
         false
     }
@@ -117,8 +120,8 @@ impl MyIBusContext {
 
     fn ibus_my_engine_update(&mut self, engine: *mut IBusEngine) {
         self.ibus_my_engine_update_preedit(engine);
-        self.ibus_my_engine_update_auxiliary_text(engine);
-        self.ibus_my_engine_lookup_table();
+        // self.ibus_my_engine_update_auxiliary_text(engine);
+        unsafe{ibus_engine_hide_lookup_table(engine);}
     }
 
     fn ibus_my_engine_update_preedit(&mut self, engine: *mut IBusEngine) {
@@ -132,6 +135,14 @@ impl MyIBusContext {
                     0,
                     self.preedit.len() as guint,
                 ),
+            );
+            let preedit_text = self.preedit.to_ibus_text();
+            ibus_text_set_attributes(preedit_text, preedit_attrs);
+            ibus_engine_update_preedit_text(
+                engine,
+                preedit_text,
+                self.preedit.len() as u32,
+                to_gboolean(!self.preedit.is_empty()),
             );
         }
     }
