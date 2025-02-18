@@ -5,14 +5,16 @@
 use anyhow::Ok;
 use ibus_sys::attr_list::{ibus_attr_list_append, ibus_attr_list_new};
 use ibus_sys::attribute::{
-    ibus_attribute_new, IBusAttrType_IBUS_ATTR_TYPE_UNDERLINE,
-    IBusAttrUnderline_IBUS_ATTR_TYPE_SINGLE,
+    ibus_attribute_new, IBusAttrType_IBUS_ATTR_TYPE_BACKGROUND,
+    IBusAttrType_IBUS_ATTR_TYPE_UNDERLINE, IBusAttrUnderline_IBUS_ATTR_TYPE_SINGLE,
 };
-use ibus_sys::core::{ibus_main, to_gboolean, IBusModifierType_IBUS_RELEASE_MASK};
+use ibus_sys::core::{ibus_main, to_gboolean, IBusModifierType_IBUS_CONTROL_MASK, IBusModifierType_IBUS_MOD1_MASK, IBusModifierType_IBUS_RELEASE_MASK};
 use ibus_sys::engine::{
-    self, ibus_engine_commit_text, ibus_engine_hide_lookup_table, ibus_engine_update_preedit_text, IBusEngine
+    self, ibus_engine_commit_text, ibus_engine_hide_lookup_table, ibus_engine_update_lookup_table,
+    ibus_engine_update_preedit_text, IBusEngine,
 };
 use ibus_sys::glib::{gchar, gint, guint};
+use ibus_sys::ibus_keysyms::{IBUS_KEY_a, IBUS_KEY_z, IBUS_KEY_A, IBUS_KEY_Z};
 use ibus_sys::keys::ibus_keyval_from_name;
 use ibus_sys::lookup_table::IBusLookupTable;
 use ibus_sys::text::{ibus_text_set_attributes, StringExt};
@@ -70,6 +72,7 @@ pub(crate) fn ibus_my_engine_command_map() -> HashMap<&'static str, MyIBusEngine
 struct MyIBusContext {
     command_map: HashMap<&'static str, MyIBusEngineCommand>,
     prop_controller: PropController,
+    raw_input: String,
     preedit: String,
     cursor_pos: i32,
     lookup_table: IBusLookupTable,
@@ -80,6 +83,7 @@ impl MyIBusContext {
         MyIBusContext {
             command_map: ibus_my_engine_command_map(),
             prop_controller: PropController::new(),
+            raw_input: String::new(),
             preedit: String::new(),
             cursor_pos: 0,
             lookup_table: IBusLookupTable::new(10, 0, 1, 1),
@@ -98,9 +102,23 @@ impl MyIBusContext {
             return false;
         }
 
-        let text = char::from_u32(keycode).unwrap().to_string();
-        self.ibus_my_engine_commit_string(engine, &text);
-        self.ibus_my_engine_update(engine);
+        if (IBUS_KEY_A..IBUS_KEY_Z + 1).contains(&keyval)
+            || (IBUS_KEY_a..IBUS_KEY_z + 1).contains(&keyval)
+        {
+            if modifiers & (IBusModifierType_IBUS_CONTROL_MASK | IBusModifierType_IBUS_MOD1_MASK) == 0 {
+                self.preedit = char::from_u32(keyval).unwrap().to_string();
+                println!("{}", self.preedit);
+                self.ibus_my_engine_commit_string(engine);
+                return true;
+            }
+        } else {
+            if keyval < 128 {
+                
+            }
+        }
+
+        // let text = char::from_u32(keyval).unwrap().to_string();
+        
 
         false
     }
@@ -112,16 +130,17 @@ impl MyIBusContext {
         true
     }
 
-    fn ibus_my_engine_commit_string(&mut self, engine: *mut IBusEngine, text: &str) {
+    fn ibus_my_engine_commit_string(&mut self, engine: *mut IBusEngine) {
         unsafe {
-            ibus_engine_commit_text(engine, text.to_ibus_text());
+            ibus_engine_commit_text(engine, self.preedit.to_ibus_text());
         }
+        self.ibus_my_engine_update(engine);
     }
 
     fn ibus_my_engine_update(&mut self, engine: *mut IBusEngine) {
         self.ibus_my_engine_update_preedit(engine);
         // self.ibus_my_engine_update_auxiliary_text(engine);
-        unsafe{ibus_engine_hide_lookup_table(engine);}
+        self.ibus_my_engine_update_lookup_table(engine);
     }
 
     fn ibus_my_engine_update_preedit(&mut self, engine: *mut IBusEngine) {
@@ -149,7 +168,16 @@ impl MyIBusContext {
 
     fn ibus_my_engine_update_auxiliary_text(&mut self, engine: *mut IBusEngine) {}
 
-    fn ibus_my_engine_lookup_table(&mut self) {}
+    fn ibus_my_engine_update_lookup_table(&mut self, engine: *mut IBusEngine) {
+        unsafe {
+            let visible = self.lookup_table.get_number_candidates();
+            ibus_engine_update_lookup_table(
+                engine,
+                &mut self.lookup_table as *mut IBusLookupTable,
+                visible as i32,
+            );
+        }
+    }
 
     fn run_event_listener(&mut self, engine: *mut IBusEngine) {}
 
@@ -200,8 +228,8 @@ extern "C" {
 unsafe extern "C" fn process_key_event(
     context: *mut c_void,
     engine: *mut IBusEngine,
-    keycode: guint,
     keyval: guint,
+    keycode: guint,
     modifiers: guint,
 ) -> bool {
     let context = &mut *(context as *mut MyIBusContext);
