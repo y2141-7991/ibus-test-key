@@ -227,8 +227,6 @@ impl MyIBusContext {
         }
     }
 
-    fn run_event_listener(&mut self, engine: *mut IBusEngine) {}
-
     fn ibus_my_engine_do_focus_in(&mut self, engine: *mut IBusEngine) {
         println!("Focus In");
         self.prop_controller.do_focus_in(engine);
